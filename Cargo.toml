@@ -1,0 +1,7 @@
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package]
+name                        = "rust_http_chat_server"
+version                     = "0.0.0-git"
+publish                     = false
+edition                     = "2021"

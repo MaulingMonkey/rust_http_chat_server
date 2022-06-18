@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>example chat</title>
+    <style>
+        body {
+            padding:        0;
+            overflow:       hidden;
+            margin:         0;
+        }
+
+        #container {
+            display:        flex;
+            flex-direction: column;
+            width:          100vw;
+            height:         100vh;
+        }
+        #container > * { margin: 0.5em; }
+        #header     { flex: 0 0 auto; }
+        #history    { flex: 1 1 0;    }
+        #input      { flex: 0 0 auto; }
+
+        #header {
+            text-align:     center;
+            border-radius:  0.5em;
+            padding:        0.5em;
+            background:     #000;
+            color:          #FFF;
+        }
+
+        #history {
+            overflow:       hidden scroll;
+            border-radius:  0.5em;
+            padding:        0.5em;
+            background:     #888;
+            color:          #000;
+        }
+
+        #input {
+            display:        flex;
+            border-radius:  0.5em;
+            background:     #000;
+        }
+        #name       { flex: 1; }
+        #message    { flex: 5; }
+
+        #name {
+            background:     #FFF;
+            color:          #000;
+        }
+
+        #message {
+            background:     #FFF;
+            color:          #000;
+        }
+    </style>
+    <script>
+        function keypress(e) {
+            if (e.key == "Enter" || e.keyCode == 13) {
+                var name = document.getElementById("name").value || "user";
+                var message = document.getElementById("message");
+                let text = message.value;
+                message.value = "";
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "chat");
+                xhr.send(`<${name}> ${text}`);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    </script>
+</head><body>
+    <div id="container">
+        <div id="header">rust_http_chat_server</div>
+        <div id="history">
+        </div>
+        <div id="input">
+            <input id="name"    type="text" value="user">
+            <input id="message" type="text" autofocus onkeypress="keypress(event)">
+        </div>
+    </div>
+    <script>
+        var es = new EventSource("chat");
+        es.onmessage = function(e) {
+            var div = document.createElement("div");
+            div.textContent = e.data;
+            document.getElementById("history").appendChild(div);
+        };
+    </script>
+</body></html>
