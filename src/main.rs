@@ -79,7 +79,7 @@ fn handle_request(common: &Common, mut stream: &TcpStream) -> io::Result<()> {
     let mut read = 0;
 
     loop {
-        if read == request.len() { return write!(BufWriter::new(stream), "HTTP/1.1 413 Payload Too Large\r\n\r\n") }
+        if read == request.len() { return write!(stream, "HTTP/1.1 413 Payload Too Large\r\n\r\n") }
         let prev_read = read;
         let this_read = stream.read(&mut request[read..])?;
         if this_read == 0 { return write!(stream, "HTTP/1.0 400 Bad Request\r\n\r\n") }
@@ -119,11 +119,11 @@ fn handle_request(common: &Common, mut stream: &TcpStream) -> io::Result<()> {
 
             if let Some((method, (url, version))) = request_line.split_once(" ").map(|(m, u_v)| (m, u_v.split_once(" ").unwrap_or((u_v, "")))) {
                 let response_version = match version {
-                    "HTTP/0.9"                      => return write!(BufWriter::new(stream), "HTTP/1.0 426 Upgrade Required\r\nUpgrade: HTTP/1.1, HTTP/1.0\r\n\r\n"),
+                    "HTTP/0.9"                      => return write!(stream, "HTTP/1.0 426 Upgrade Required\r\nUpgrade: HTTP/1.1, HTTP/1.0\r\n\r\n"),
                     "HTTP/1.0"                      => "HTTP/1.0",
                     v if v.starts_with("HTTP/1.")   => "HTTP/1.1",
                     v if v.starts_with("HTTP/")     => "HTTP/1.1",
-                    _                               => return write!(BufWriter::new(stream), "HTTP/1.0 505 HTTP Version Not Supported\r\n\r\n"),
+                    _                               => return write!(stream, "HTTP/1.0 505 HTTP Version Not Supported\r\n\r\n"),
                 };
 
                 let cargo_bin_name = env!("CARGO_BIN_NAME");
